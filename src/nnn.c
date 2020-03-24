@@ -1528,6 +1528,8 @@ static bool initcurses(void *oldmask)
 		memset(g_ctx[i].c_fltr, 0, REGEX_MAX);
 	}
 
+  init_pair(8, 9, -1);
+
 	settimeout(); /* One second */
 	set_escdelay(25);
 	return TRUE;
@@ -3251,6 +3253,15 @@ static void printent(const struct entry *ent, uint namecols, bool sel)
 	/* Directories are always shown on top */
 	resetdircolor(ent->flags);
 
+  /* File colors need fixing for some reason */
+  if (! (ent->flags & DIR_OR_LINK_TO_DIR)) {
+    if (dents[cur].name == ent->name) {
+      attron(COLOR_PAIR(8));
+    } else {
+      attroff(COLOR_PAIR(8));
+    }
+  }
+
 	addch((ent->flags & FILE_SELECTED) ? '+' : ' ');
 
 	if (attrs)
@@ -3274,6 +3285,15 @@ static void printent_long(const struct entry *ent, uint namecols, bool sel)
 
 	/* Directories are always shown on top */
 	resetdircolor(ent->flags);
+
+  /* File colors need fixing for some reason */
+  if (! (ent->flags & DIR_OR_LINK_TO_DIR)) {
+    if (dents[cur].name == ent->name) {
+      attron(COLOR_PAIR(8));
+    } else {
+      attroff(COLOR_PAIR(8));
+    }
+  }
 
 	addch((ent->flags & FILE_SELECTED) ? '+' : ' ');
 
@@ -4907,6 +4927,7 @@ static void draw_line(char *path, int ncols)
 	if (dir)
 		attroff(COLOR_PAIR(cfg.curctx + 1) | A_BOLD);
 
+  attroff(COLOR_PAIR(8));
 	statusbar(path);
 }
 
